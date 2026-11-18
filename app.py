@@ -201,21 +201,31 @@ if menu == "Add Patient":
                     patient["cholesterol"]
                 )
 
-                update_patient(
-                    patient["id"],
-                    patient["full_name"],
-                    patient["dob"],
-                    patient["email"],
-                    patient["glucose"],
-                    patient["haemoglobin"],
-                    patient["cholesterol"],
-                    remarks
-                )
+                if (
+                    remarks.startswith("AI remarks are temporarily unavailable")
+                    or remarks.startswith("AI remarks unavailable:")
+                    or remarks == "AI remarks could not be generated."
+                ):
+                    st.warning(remarks)
 
-                st.session_state["generated_remarks"] = remarks
+                else:
+                    updated = update_patient(
+                        patient["id"],
+                        patient["full_name"],
+                        patient["dob"],
+                        patient["email"],
+                        patient["glucose"],
+                        patient["haemoglobin"],
+                        patient["cholesterol"],
+                        remarks
+                    )
 
-            if "generated_remarks" in st.session_state:
-                st.write(st.session_state["generated_remarks"])
+                    if updated:
+                        st.session_state["generated_remarks"] = remarks
+                        st.success("AI remarks generated and saved successfully!")
+                        st.rerun()
+                    else:
+                        st.error("Could not save AI remarks.")
 
 
 # =====================================
